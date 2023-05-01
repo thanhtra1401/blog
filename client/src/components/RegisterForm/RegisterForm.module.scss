@@ -1,0 +1,58 @@
+.register {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 30rem;
+  width: 30rem;
+  padding: 0 2rem;
+  background-color: #fff;
+  border-radius: 4px;
+  .title {
+    font-size: 2rem;
+    color: rgb(162, 6, 6);
+    margin-bottom: 2rem;
+  }
+  .form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    .input {
+      height: 2.8rem;
+      margin-bottom: 0.5rem;
+      outline: none;
+      border-radius: 2px;
+      border: none;
+      border-bottom: 1px solid #333;
+    }
+    .btn {
+      margin-top: 0.5rem;
+      padding: 0.8rem;
+      border: none;
+      background-color: rgb(162, 6, 6);
+      color: #fff;
+      font-size: 1.6rem;
+      border-radius: 2px;
+      cursor: pointer;
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+    .error {
+      margin: 1rem 0;
+      text-align: center;
+      font-size: 1.2rem;
+      color: red;
+    }
+    .navigate {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      text-align: center;
+      .link {
+        text-decoration: none;
+        margin-left: 0.3rem;
+        color: rgb(162, 6, 6);
+      }
+    }
+  }
+}
