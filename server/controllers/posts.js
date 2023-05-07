@@ -59,7 +59,6 @@ const updatePost = (req, res) => {
     const postId = req.params.id;
     const q =
       "update posts set `title` = ?, `desc` = ?, `img` = ?, `cat` = ? where `id`=? and`uid` = ?";
-
     const values = [req.body.title, req.body.desc, req.body.img, req.body.cat];
     db.query(q, [...values, postId, userInfo.id], (err, data) => {
       if (err) return res.status(500).json({ success: false, message: err });
@@ -76,6 +75,7 @@ const deletePost = (req, res) => {
         .status(403)
         .json({ success: false, message: "Token is not valid!" });
     const postId = req.params.id;
+
     const q = "delete from posts where `id` = ? and  `uid` = ?";
     db.query(q, [postId, userInfo.id], (err, data) => {
       if (err)
