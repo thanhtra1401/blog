@@ -1,56 +1,119 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styles from "./PostDetail.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import moment from "moment";
+import { AuthContext } from "../../context/AuthContext";
+import Swal from "sweetalert2";
 
-export default function PostDetail() {
+export default function PostDetail({ setPostToMenu }) {
+  const getText = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent;
+  };
+  const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
+  const [post, setPost] = useState({});
+  const location = useLocation();
+  const postId = location.pathname.split("/")[2];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:8000/api/posts/${postId}`
+        );
+
+        setPost(res.data.dataPU);
+        setPostToMenu(res.data.dataPU);
+      } catch (error) {
+        alert(error);
+      }
+    };
+    fetchData();
+  }, [postId]);
+  const handleDelete = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axios.delete(
+            `http://localhost:8000/api/posts/${postId}`,
+            {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (res.data.success) {
+            Swal.fire("Deleted!", "Your post has been deleted.", "success");
+            navigate("/");
+          } else Swal.fire(res.data.message);
+        } catch (error) {
+          alert(error);
+        }
+      }
+    });
+  };
+
+  const showPostAction = () => {
+    if (currentUser) {
+      return currentUser.username === post.username;
+    }
+  };
+  // useEffect(() => {
+  //   setCat({ isLoading: false, cat: post.cat });
+  // }, [postId]);
+  // console.log(handlegetCat);
+  // const handle = (cat) => {
+  //   console.log(cat);
+  // };
+
   return (
     <div className={styles.postDetail}>
       <div className={styles.content}>
-        <img
-          src="https://static.photocdn.pt/images/articles/2018/12/05/articles/2017_8/beginner_photography_mistakes-1.webp"
-          alt="img"
-        />
+        <img src={`/upload/${post.img}`} alt={post.title} />
         <div className={styles.postInfo}>
           <div className={styles.user}>
             <img
-              src="https://static.photocdn.pt/images/articles/2018/12/05/articles/2017_8/beginner_photography_mistakes-1.webp"
-              alt="img"
+              src={
+                post.userImg ||
+                "https://i.pinimg.com/originals/c6/e5/65/c6e56503cfdd87da299f72dc416023d4.jpg"
+              }
+              alt={post.username}
             />
             <div className={styles.info}>
-              <span>Tra</span>
-              <p>Posted 2 days ago</p>
+              <span>{post.username}</span>
+              <p>Posted {moment(post.date).fromNow()}</p>
             </div>
           </div>
-          <div className={styles.edit}>
-            <span className={styles.iconEdit}>
-              <Link to={`/write?edit=2`} className={styles.link}>
-                <i className="fa-solid fa-pen"></i>
-              </Link>
-            </span>
 
-            <span className={styles.iconDelete}>
-              <i className="fa-solid fa-trash"></i>
-            </span>
-          </div>
+          {showPostAction() && (
+            <div className={styles.edit}>
+              <span className={styles.iconEdit}>
+                <Link to={`/write?edit=2`} className={styles.link} state={post}>
+                  <i className="fa-solid fa-pen"></i>
+                </Link>
+              </span>
+
+              <span className={styles.iconDelete} onClick={handleDelete}>
+                <i className="fa-solid fa-trash"></i>
+              </span>
+            </div>
+          )}
         </div>
 
-        <h1>Fernandes tỏa sáng, Man Utd đánh bại Aston Villa</h1>
-        <p>
-          Man Utd và Aston Villa tạo nên một trận đấu sôi động với nhiều tình
-          huống tranh chấp quyết liệt, tuy nhiên cả hai đội bóng đều không tạo
-          được nhiều những cơ hội thực sự trước cầu môn của nhau. Đội chủ sân
-          Old Trafford kiểm soát bóng 57% thời gian, có 14 lần dứt điểm, 6 lần
-          bóng đi trúng khung thành, dẫu vậy chỉ số bàn thắng trông đợi chỉ là
-          1,29. Aston Villa có 43% thời gian cầm bóng, chỉ 7 lần dứt điểm, một
-          lần bóng đi trúng khung thành và chỉ số bàn thắng trông đợi là 0,49.
-          Bàn thắng duy nhất của trận đấu được ghi bởi Fernandes ở phút 39. Cầu
-          thủ người Bồ Đào Nha băng vào rất nhanh dứt điểm từ góc hẹp bên phải
-          đưa bóng vào lưới sau khi thủ thành Martinez đổ người đẩy cú sút của
-          Rashford. Man Utd xứng đáng với bàn thắng bởi họ chơi nhỉnh hơn đội
-          khách trong khoảng thời gian dài của hiệp một, trước khi ghi bàn "Quỷ
-          đỏ" từng khiến khung thành của Aston Villa sau cú sút dội xà ngang của
-          Sancho ở phút 27.
-        </p>
+        <h1>{post.title}</h1>
+        <p>{getText(post.desc)}</p>
       </div>
     </div>
   );

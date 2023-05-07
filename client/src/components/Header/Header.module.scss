@@ -6,6 +6,7 @@
   background-color: #fff;
   .logo {
     width: 12rem;
+    cursor: pointer;
   }
   .navbar {
     display: flex;
@@ -21,7 +22,9 @@
       margin: 0 0.6rem;
       font-weight: 400;
       cursor: pointer;
+      color: #333;
     }
+
     .write {
       margin-left: 0.6rem;
       width: 5rem;

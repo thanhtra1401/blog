@@ -1,11 +1,22 @@
-import React from "react";
+import React, { useContext } from "react";
 import styles from "./Header.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Header() {
+  const navigate = useNavigate();
+  const { currentUser, logout } = useContext(AuthContext);
+  const toHome = () => {
+    navigate("/");
+  };
   return (
     <div className={`container ${styles.header}`}>
-      <img className={styles.logo} src="/img/logo.jpg" alt="logo" />
+      <img
+        className={styles.logo}
+        src="/img/logo.jpg"
+        alt="logo"
+        onClick={toHome}
+      />
       <div className={styles.navbar}>
         <Link to="/?cat=sport" className={styles.link}>
           <h6>SPORT</h6>
@@ -25,8 +36,21 @@ export default function Header() {
         <Link to="/?cat=news" className={styles.link}>
           <h6>NEWS</h6>
         </Link>
-        <span className={styles.text}>Tra</span>
-        <span className={styles.text}>Logout</span>
+        <span className={styles.text}>{currentUser?.username}</span>
+        {currentUser ? (
+          <span className={styles.text} onClick={logout}>
+            Logout
+          </span>
+        ) : (
+          <Link
+            to="/login"
+            className={styles.text}
+            style={{ textDecoration: "none" }}
+          >
+            Login
+          </Link>
+        )}
+
         <span className={styles.write}>
           <Link className={styles.writeLink} to="/write">
             Write
